@@ -1,0 +1,39 @@
+version: "3.8"
+services:
+  dcs-postgres:
+    image: postgres:15.3-alpine
+    container_name: dcs-postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: yCj1Q1DKznby
+      POSTGRES_USER: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - agent_network
+
+  dcs-pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: dcs-pgadmin
+    restart: always
+    depends_on:
+      - dcs-postgres
+    environment:
+      PGADMIN_DEFAULT_EMAIL: atentbot@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: yCj1Q1DKznby
+    ports:
+      - "8080:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    networks:
+      - agent_network
+
+networks:
+  agent_network:
+    external: true
+
+volumes:
+  postgres_data:
+  pgadmin_data:

@@ -1,0 +1,53 @@
+version: "3.8"
+
+services:
+  evolution_api:
+    image: atendai/evolution-api:v1.6.1
+    command: ["node", "./dist/src/main.js"]
+    ports:
+      - '7777:8080'  # Mapeamento da porta 7777 no host para a porta 8080 no contêiner
+    networks:
+      - agent_network
+    volumes:
+      - eapi_instances:/evolution/instances
+      - eapi_store:/evolution/store
+    environment:
+      SERVER_URL: https://172.30.241.245
+      CONFIG_SESSION_PHONE_CLIENT: atentbot
+      AUTHENTICATION_TYPE: apikey
+      AUTHENTICATION_API_KEY: eJ55tK2Hg5Xrf0zlmKvXGx8woIJsRNHw
+      # Permanent data storage MongoDB
+      DATABASE_ENABLED: "true"
+      DATABASE_CONNECTION_URI: mongodb://mongodb:yCj1Q1DKznby@172.30.241.245:27017/?authSource=admin&readPreference=primary&ssl=false&directConnection=true
+      DATABASE_CONNECTION_DB_PREFIX_NAME: evdocker
+      # Choose the data you want to save in the application's database or store
+      DATABASE_SAVE_DATA_INSTANCE: "true"
+      DATABASE_SAVE_DATA_NEW_MESSAGE: "true"
+      DATABASE_SAVE_MESSAGE_UPDATE: "false"
+      DATABASE_SAVE_DATA_CONTACTS: "false"
+      DATABASE_SAVE_DATA_CHATS: "false"
+      #logs definição
+      LOG_LEVEL: ERROR,WARN
+      # config adicional
+      DEL_INSTANCE: "false"
+      AUTHENTICATION_EXPOSE_IN_FETCH_INSTANCES: "true"
+    deploy:
+      mode: replicated
+      replicas: 1
+      resources:
+        limits:
+          cpus: "0.2"
+          memory: 100M
+      placement:
+        constraints:
+          - node.role == manager      
+
+networks:
+  agent_network:
+    external: true
+
+volumes:
+  eapi_instances:
+    external: true
+  eapi_store:
+    external: true
